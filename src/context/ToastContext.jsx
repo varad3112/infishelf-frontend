@@ -39,7 +39,7 @@ export function ToastProvider({ children }) {
               {toast.type === 'error' && <AlertCircle size={18} />}
               {toast.type === 'info' && <Info size={18} />}
             </span>
-            <span style={{ fontSize: '0.875rem', fontWeight: 500, flex: 1, color: '#ffffff' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 500, flex: 1, color: '#0f172a' }}>
               {toast.message}
             </span>
             <button

@@ -65,6 +65,29 @@ export const productService = {
   },
 
   /**
+   * Upload a local packshot image file (Requires Auth)
+   * returns: { success, image_url, relative_url }
+   */
+  async uploadImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await api.post('/api/products/upload-image/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  /**
+   * Fetch catalog statistics, KPIs and distributions for the dashboard
+   */
+  async getStatistics() {
+    const response = await api.get('/api/products/statistics/');
+    return response.data;
+  },
+
+  /**
    * Natural Language Smart Search
    * input: { query }
    */

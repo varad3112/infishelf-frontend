@@ -18,7 +18,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim() || !password) {
-      setFormError('Please enter both username and password.');
+      setFormError('Please enter your username or email address and password.');
       return;
     }
 
@@ -26,8 +26,8 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setFormError('');
 
     try {
-      await login(username, password);
-      success(`Welcome back, ${username}!`);
+      await login(username.trim(), password);
+      success('Signed in successfully.');
       onClose();
       setUsername('');
       setPassword('');
@@ -35,7 +35,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
       const msg =
         err.response?.data?.detail ||
         err.response?.data?.error ||
-        'Invalid username or password. Please try again.';
+        'Invalid username/email or password. Please try again.';
       setFormError(msg);
       toastError(msg);
     } finally {
@@ -72,11 +72,11 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
         )}
 
         <Input
-          label="Username"
+          label="Username or Email Address"
           name="username"
           required
           autoFocus
-          placeholder="e.g. alex_cpg"
+          placeholder="e.g. varad or varadk.official@gmail.com"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />

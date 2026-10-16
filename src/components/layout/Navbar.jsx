@@ -17,7 +17,7 @@ export function Navbar({
           <a href="/" className="brand-logo">
             <span className="brand-dot" />
             <span>InfiShelf</span>
-            <span className="brand-badge">AI Catalog</span>
+            <span className="brand-badge">Enterprise Catalog</span>
           </a>
 
           {/* Quick Counter */}
@@ -27,14 +27,14 @@ export function Navbar({
               alignItems: 'center',
               gap: '0.4rem',
               padding: '0.25rem 0.65rem',
-              background: 'rgba(255, 255, 255, 0.05)',
+              background: 'var(--bg-surface-elevated)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-full)',
               fontSize: '0.75rem',
               color: 'var(--text-subtle)',
             }}
           >
-            <Layers size={12} color="var(--accent-sky)" />
+            <Layers size={12} color="var(--accent-primary)" />
             <span>
               <strong>{totalProducts}</strong> products
             </span>
@@ -54,17 +54,6 @@ export function Navbar({
             <FileCode2 size={14} />
             <span>API Docs</span>
           </a>
-
-          {/* Add Product CTA */}
-          <Button
-            variant="primary"
-            size="sm"
-            icon={Plus}
-            onClick={onOpenAddProduct}
-            style={{ fontWeight: 700 }}
-          >
-            Add Product
-          </Button>
 
           {/* User Auth Controls */}
           {user ? (
@@ -98,12 +87,12 @@ export function Navbar({
                 Sign In
               </Button>
               <Button
-                variant="secondary"
+                variant="primary"
                 size="sm"
                 icon={UserPlus}
                 onClick={onOpenRegister}
               >
-                Register
+                Get Started
               </Button>
             </div>
           )}

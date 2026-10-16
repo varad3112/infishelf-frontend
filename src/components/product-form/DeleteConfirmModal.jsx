@@ -24,6 +24,12 @@ export function DeleteConfirmModal({
       onSuccess();
       onClose();
     } catch (err) {
+      if (err.response?.status === 404) {
+        success(`"${product.name}" has already been removed.`);
+        onSuccess();
+        onClose();
+        return;
+      }
       console.error('Delete error:', err);
       toastError(
         err.response?.data?.detail ||

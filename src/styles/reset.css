@@ -8,7 +8,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -80,10 +80,10 @@ img {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-surface-elevated);
+  background: #cbd5e1;
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-glass);
+  background: #94a3b8;
 }

@@ -7,21 +7,21 @@ export function Footer() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <span style={{ fontWeight: 700, color: 'var(--text-white)' }}>InfiShelf</span>
           <span>•</span>
-          <span>CPG & Retail Shelf Intelligence Platform</span>
+          <span>Enterprise Product & Category Management Platform</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', fontSize: '0.8rem' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <Database size={14} color="var(--accent-sky)" />
-            <span>PostgreSQL & Django 5</span>
+            <Database size={14} color="var(--accent-primary)" />
+            <span>PostgreSQL & Django REST</span>
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <Cpu size={14} color="#a855f7" />
-            <span>Google Gemini GenAI</span>
+            <Cpu size={14} color="#6366f1" />
+            <span>Natural Language Search</span>
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <ShieldCheck size={14} color="var(--color-success)" />
-            <span>JWT Stateless Auth</span>
+            <span>JWT Authentication</span>
           </span>
         </div>
       </div>

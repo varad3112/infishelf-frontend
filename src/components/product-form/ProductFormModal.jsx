@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Sparkles, Save } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Sparkles, Save, Upload, Link as LinkIcon, Image as ImageIcon, CheckCircle2, X } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Input } from '../common/Input';
 import { Button } from '../common/Button';
@@ -15,6 +15,7 @@ export function ProductFormModal({
 }) {
   const isEditing = Boolean(initialData?.id);
   const { success, error: toastError } = useToast();
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -30,6 +31,11 @@ export function ProductFormModal({
   const [aiGenerating, setAiGenerating] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // Image upload state
+  const [imageMode, setImageMode] = useState('upload'); // 'upload' | 'url'
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [localPreview, setLocalPreview] = useState('');
+
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -41,6 +47,8 @@ export function ProductFormModal({
         description: initialData.description || '',
         tags: Array.isArray(initialData.tags) ? initialData.tags.join(', ') : '',
       });
+      setLocalPreview(initialData.image_url || '');
+      setImageMode(initialData.image_url?.startsWith('http') || initialData.image_url?.startsWith('/') ? 'url' : 'upload');
     } else {
       setFormData({
         name: '',
@@ -51,9 +59,42 @@ export function ProductFormModal({
         description: '',
         tags: '',
       });
+      setLocalPreview('');
+      setImageMode('upload');
     }
     setErrors({});
   }, [initialData, isOpen]);
+
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toastError('Please select a valid image file (PNG, JPG, WEBP).');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toastError('Image file size must be less than 5MB.');
+      return;
+    }
+
+    // Show local preview immediately
+    const previewUrl = URL.createObjectURL(file);
+    setLocalPreview(previewUrl);
+
+    setUploadingImage(true);
+    try {
+      const res = await productService.uploadImage(file);
+      setFormData((prev) => ({ ...prev, image_url: res.image_url }));
+      success('Image uploaded successfully!');
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      toastError(err.response?.data?.error || 'Failed to upload image. Please try again or provide an image link.');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -253,15 +294,92 @@ export function ProductFormModal({
           />
         </div>
 
-        <Input
-          label="Image URL"
-          name="image_url"
-          type="url"
-          placeholder="https://images.unsplash.com/..."
-          value={formData.image_url}
-          onChange={handleChange}
-          error={errors.image_url}
-        />
+        {/* Image Upload / URL Selector Section */}
+        <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <label className="form-label" style={{ margin: 0 }}>
+              Product Packshot Image
+            </label>
+
+            <div className="image-mode-tabs">
+              <button
+                type="button"
+                className={`image-mode-btn ${imageMode === 'upload' ? 'active' : ''}`}
+                onClick={() => setImageMode('upload')}
+              >
+                <Upload size={13} style={{ marginRight: 4 }} />
+                Upload Local File
+              </button>
+              <button
+                type="button"
+                className={`image-mode-btn ${imageMode === 'url' ? 'active' : ''}`}
+                onClick={() => setImageMode('url')}
+              >
+                <LinkIcon size={13} style={{ marginRight: 4 }} />
+                Image URL
+              </button>
+            </div>
+          </div>
+
+          {imageMode === 'upload' ? (
+            <div className="local-upload-container">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleFileSelect}
+              />
+
+              <div
+                className={`dropzone-box ${uploadingImage ? 'uploading' : ''}`}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {localPreview || formData.image_url ? (
+                  <div className="dropzone-preview">
+                    <img
+                      src={localPreview || formData.image_url}
+                      alt="Product preview"
+                      className="dropzone-img"
+                    />
+                    <div className="dropzone-overlay">
+                      <Upload size={20} />
+                      <span>{uploadingImage ? 'Uploading image...' : 'Click to Change Image'}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="dropzone-placeholder">
+                    <div className="dropzone-icon-circle">
+                      <Upload size={24} style={{ color: 'var(--accent-sky)' }} />
+                    </div>
+                    <span className="dropzone-title">
+                      {uploadingImage ? 'Uploading image...' : 'Click or Drag & Drop local packshot image'}
+                    </span>
+                    <span className="dropzone-hint">PNG, JPG, WEBP up to 5MB</span>
+                  </div>
+                )}
+              </div>
+
+              {formData.image_url && (
+                <div className="image-status-row">
+                  <CheckCircle2 size={15} style={{ color: '#10b981' }} />
+                  <span className="image-status-text">
+                    Packshot linked: <code className="image-url-code">{formData.image_url.substring(0, 45)}...</code>
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Input
+              name="image_url"
+              type="text"
+              placeholder="e.g. /products/coca-cola-zero.jpg or https://images.unsplash.com/..."
+              value={formData.image_url}
+              onChange={handleChange}
+              error={errors.image_url}
+            />
+          )}
+        </div>
 
         {/* Description Field with GenAI Button */}
         <div className="form-group">

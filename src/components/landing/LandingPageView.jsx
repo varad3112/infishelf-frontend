@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Package,
 } from 'lucide-react';
+import { DOCS_URL } from '../../services/api';
 
 export function LandingPageView({
   onOpenLogin,
@@ -47,7 +48,7 @@ export function LandingPageView({
           </button>
 
           <a
-            href="http://localhost:8000/api/docs/"
+            href={DOCS_URL}
             target="_blank"
             rel="noreferrer"
             className="hero-btn-secondary"

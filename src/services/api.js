@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 // Use environment variable if provided, or default to relative path (leveraging Vite dev proxy)
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+// Strip trailing /api or / so endpoints calling /api/... work regardless of whether user includes /api in the env var
+const cleanBaseUrl = rawBaseUrl.replace(/\/api\/?$/, '').replace(/\/+$/, '');
+
+export const BASE_URL = cleanBaseUrl;
+export const DOCS_URL = (cleanBaseUrl || 'http://localhost:8000') + '/api/docs/';
 
 export const api = axios.create({
   baseURL: BASE_URL,

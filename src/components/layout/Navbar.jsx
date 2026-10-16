@@ -1,5 +1,6 @@
 import { Layers, Plus, LogIn, UserPlus, LogOut, FileCode2, Sparkles } from 'lucide-react';
 import { Button } from '../common/Button';
+import { DOCS_URL } from '../../services/api';
 
 export function Navbar({
   user,
@@ -45,7 +46,7 @@ export function Navbar({
         <div className="navbar-actions">
           {/* Swagger Docs Link */}
           <a
-            href="http://localhost:8000/api/docs/"
+            href={DOCS_URL}
             target="_blank"
             rel="noreferrer"
             className="btn btn-secondary btn-sm"

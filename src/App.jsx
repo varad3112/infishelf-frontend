@@ -8,6 +8,7 @@ import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { Footer } from './components/layout/Footer';
 import { Button } from './components/common/Button';
+import { DOCS_URL } from './services/api';
 
 import { DashboardView } from './components/dashboard/DashboardView';
 import { ManageCatalogView } from './components/catalog/ManageCatalogView';
@@ -111,7 +112,7 @@ export default function App() {
 
               <div className="topbar-right">
                 <a
-                  href="http://localhost:8000/api/docs/"
+                  href={DOCS_URL}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-secondary btn-sm"

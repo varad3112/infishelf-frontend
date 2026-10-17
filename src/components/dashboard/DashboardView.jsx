@@ -87,10 +87,7 @@ export function DashboardView({ onNavigateToManage, onOpenAddProduct, onViewProd
     <div className="dashboard-container">
       {/* Top Header & Actions */}
       <div className="dashboard-header">
-        <div>
-          <h1 className="dashboard-title">Catalog Intelligence Dashboard</h1>
-          <p className="dashboard-subtitle">Real-time inventory metrics, brand analytics, and retail pricing tiers.</p>
-        </div>
+      
 
         <div className="dashboard-header-actions">
           <Button

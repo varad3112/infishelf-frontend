@@ -17,26 +17,36 @@ import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 
 export function DashboardView({ onNavigateToManage, onOpenAddProduct, onViewProduct }) {
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const cached = productService.getCachedStatistics();
+  const [stats, setStats] = useState(cached);
+  const [loading, setLoading] = useState(!cached);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchStats = async () => {
-    setLoading(true);
+  const fetchStats = async (force = false) => {
+    if (force) {
+      setRefreshing(true);
+    } else if (!stats && !productService.getCachedStatistics()) {
+      setLoading(true);
+    }
     setError(null);
     try {
-      const data = await productService.getStatistics();
+      const data = await productService.getStatistics(force);
       setStats(data);
     } catch (err) {
       console.error('Failed to load dashboard stats:', err);
-      setError('Failed to load catalog metrics. Please check connection and try again.');
+      if (!stats) {
+        setError('Failed to load catalog metrics. Please check connection and try again.');
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
-    fetchStats();
+    // If we don't have fresh cache, fetch in background or cold load
+    fetchStats(false);
   }, []);
 
   if (loading) {
@@ -57,12 +67,12 @@ export function DashboardView({ onNavigateToManage, onOpenAddProduct, onViewProd
     );
   }
 
-  if (error || !stats) {
+  if (error && !stats) {
     return (
       <div className="dashboard-container">
         <div className="dashboard-error-banner">
           <p>{error || 'Unable to display dashboard data.'}</p>
-          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={fetchStats}>
+          <Button variant="secondary" size="sm" icon={RefreshCw} onClick={() => fetchStats(true)}>
             Retry Loading
           </Button>
         </div>
@@ -71,23 +81,28 @@ export function DashboardView({ onNavigateToManage, onOpenAddProduct, onViewProd
   }
 
   // Pre-calculate percentages for max visual bar width
-  const maxCategoryCount = Math.max(...(stats.category_distribution?.map((c) => c.count) || [1]), 1);
+  const maxCategoryCount = Math.max(...(stats?.category_distribution?.map((c) => c.count) || [1]), 1);
 
   return (
     <div className="dashboard-container">
       {/* Top Header & Actions */}
       <div className="dashboard-header">
-
+        <div>
+          <h1 className="dashboard-title">Catalog Intelligence Dashboard</h1>
+          <p className="dashboard-subtitle">Real-time inventory metrics, brand analytics, and retail pricing tiers.</p>
+        </div>
 
         <div className="dashboard-header-actions">
           <Button
             variant="ghost"
             size="sm"
             icon={RefreshCw}
-            onClick={fetchStats}
+            onClick={() => fetchStats(true)}
+            disabled={refreshing}
+            className={refreshing ? 'animate-spin' : ''}
             title="Refresh statistics"
           >
-            Refresh
+            {refreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
 
           <Button

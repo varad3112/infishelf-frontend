@@ -18,19 +18,57 @@ export const api = axios.create({
 
 /**
  * Token Storage Helpers for Session vs Persistent (Remember Me) Login
- * - If "Remember Me" is checked: tokens live in localStorage (persists across tabs and browser restarts)
- * - If "Remember Me" is NOT checked: tokens live in sessionStorage (isolated strictly to the active tab)
+ * - If "Remember Me" is checked: localStorage has infishelf_remember_me === 'true'
+ *   and tokens persist across tabs and browser restarts.
+ * - If "Remember Me" is NOT checked: tokens live ONLY in sessionStorage (strictly isolated to active tab).
+ *   localStorage tokens and remember_me flag are completely purged.
  */
+export const isRememberMeActive = () => {
+  return localStorage.getItem('infishelf_remember_me') === 'true';
+};
+
+// Self-healing: if localStorage contains tokens but remember_me is not active, purge them immediately
+try {
+  if (!isRememberMeActive()) {
+    localStorage.removeItem('infishelf_access_token');
+    localStorage.removeItem('infishelf_refresh_token');
+    localStorage.removeItem('infishelf_remember_me');
+  }
+} catch {
+  // Ignore in environments where storage is blocked
+}
+
 export const getStoredAccessToken = () => {
-  return sessionStorage.getItem('infishelf_access_token') || localStorage.getItem('infishelf_access_token') || null;
+  // Check active tab sessionStorage first
+  const sessionToken = sessionStorage.getItem('infishelf_access_token');
+  if (sessionToken) {
+    return sessionToken;
+  }
+
+  // Only check localStorage if the user explicitly opted into Remember Me
+  if (isRememberMeActive()) {
+    return localStorage.getItem('infishelf_access_token') || null;
+  }
+
+  return null;
 };
 
 export const getStoredRefreshToken = () => {
-  return sessionStorage.getItem('infishelf_refresh_token') || localStorage.getItem('infishelf_refresh_token') || null;
+  const sessionToken = sessionStorage.getItem('infishelf_refresh_token');
+  if (sessionToken) {
+    return sessionToken;
+  }
+
+  if (isRememberMeActive()) {
+    return localStorage.getItem('infishelf_refresh_token') || null;
+  }
+
+  return null;
 };
 
 export const setStoredTokens = (accessToken, refreshToken, remember = false) => {
   if (remember) {
+    localStorage.setItem('infishelf_remember_me', 'true');
     localStorage.setItem('infishelf_access_token', accessToken);
     if (refreshToken) {
       localStorage.setItem('infishelf_refresh_token', refreshToken);
@@ -38,20 +76,23 @@ export const setStoredTokens = (accessToken, refreshToken, remember = false) => 
     sessionStorage.removeItem('infishelf_access_token');
     sessionStorage.removeItem('infishelf_refresh_token');
   } else {
+    localStorage.removeItem('infishelf_remember_me');
+    localStorage.removeItem('infishelf_access_token');
+    localStorage.removeItem('infishelf_refresh_token');
+
     sessionStorage.setItem('infishelf_access_token', accessToken);
     if (refreshToken) {
       sessionStorage.setItem('infishelf_refresh_token', refreshToken);
     }
-    localStorage.removeItem('infishelf_access_token');
-    localStorage.removeItem('infishelf_refresh_token');
   }
 };
 
 export const clearStoredTokens = () => {
-  sessionStorage.removeItem('infishelf_access_token');
-  sessionStorage.removeItem('infishelf_refresh_token');
+  localStorage.removeItem('infishelf_remember_me');
   localStorage.removeItem('infishelf_access_token');
   localStorage.removeItem('infishelf_refresh_token');
+  sessionStorage.removeItem('infishelf_access_token');
+  sessionStorage.removeItem('infishelf_refresh_token');
 };
 
 // Request interceptor: attach JWT access token if present
@@ -125,7 +166,7 @@ api.interceptors.response.use(
         const newRefreshToken = response.data.refresh || refreshToken;
 
         // Maintain the same storage medium (sessionStorage vs localStorage)
-        setStoredTokens(newAccessToken, newRefreshToken, !isSession);
+        setStoredTokens(newAccessToken, newRefreshToken, isRememberMeActive());
 
         api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);

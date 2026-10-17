@@ -62,8 +62,8 @@ export function ProductDetailModal({
         <div>
           <div style={{ marginBottom: '1.25rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Price</span>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-white)' }}>
-              Rs. {formattedPrice}
+            <div className="tabular-nums" style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-white)' }}>
+              ₹{formattedPrice}
             </div>
           </div>
 

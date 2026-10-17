@@ -1,6 +1,28 @@
 import { api } from './api';
 
+let _cachedStatistics = null;
+let _cachedStatsTimestamp = 0;
+const STATS_CACHE_TTL_MS = 60000; // 60 seconds client cache
+
 export const productService = {
+  /**
+   * Returns current cached statistics synchronously if still fresh, or null
+   */
+  getCachedStatistics() {
+    if (_cachedStatistics && Date.now() - _cachedStatsTimestamp < STATS_CACHE_TTL_MS) {
+      return _cachedStatistics;
+    }
+    return null;
+  },
+
+  /**
+   * Clears the cached statistics so next request fetches fresh data
+   */
+  invalidateStatisticsCache() {
+    _cachedStatistics = null;
+    _cachedStatsTimestamp = 0;
+  },
+
   /**
    * Fetch paginated list of products with optional search and filters
    * params: { search, category, brand, min_price, max_price, ordering, page, page_size }
@@ -32,6 +54,7 @@ export const productService = {
    */
   async createProduct(data) {
     const response = await api.post('/api/products/', data);
+    this.invalidateStatisticsCache();
     return response.data;
   },
 
@@ -40,6 +63,7 @@ export const productService = {
    */
   async updateProduct(id, data) {
     const response = await api.put(`/api/products/${id}/`, data);
+    this.invalidateStatisticsCache();
     return response.data;
   },
 
@@ -48,6 +72,7 @@ export const productService = {
    */
   async deleteProduct(id) {
     const response = await api.delete(`/api/products/${id}/`);
+    this.invalidateStatisticsCache();
     return response.data;
   },
 
@@ -82,8 +107,13 @@ export const productService = {
   /**
    * Fetch catalog statistics, KPIs and distributions for the dashboard
    */
-  async getStatistics() {
+  async getStatistics(forceRefresh = false) {
+    if (!forceRefresh && _cachedStatistics && Date.now() - _cachedStatsTimestamp < STATS_CACHE_TTL_MS) {
+      return _cachedStatistics;
+    }
     const response = await api.get('/api/products/statistics/');
+    _cachedStatistics = response.data;
+    _cachedStatsTimestamp = Date.now();
     return response.data;
   },
 
@@ -97,5 +127,50 @@ export const productService = {
       page,
     });
     return response.data;
+  },
+
+  /**
+   * Conversational Analytics Copilot ("Chat with Your Catalog")
+   * input: { query, history }
+   */
+  async askCopilot(query, history = []) {
+    const response = await api.post('/api/products/ai/copilot/', {
+      query,
+      history,
+    });
+    return response.data;
+  },
+
+  /**
+   * Bulk upload products from CSV file (Requires Auth)
+   * returns: { success, created_count, failed_count, errors, message }
+   */
+  async bulkUpload(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post('/api/products/bulk-upload/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    this.invalidateStatisticsCache();
+    return response.data;
+  },
+
+  /**
+   * Download sample CSV template for bulk product upload
+   */
+  async downloadBulkTemplate() {
+    const response = await api.get('/api/products/bulk-template/', {
+      responseType: 'blob',
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'infishelf_sample_products.csv');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   },
 };

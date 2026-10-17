@@ -1,6 +1,5 @@
-import { Layers, Plus, LogIn, UserPlus, LogOut, FileCode2, Sparkles } from 'lucide-react';
-import { Button } from '../common/Button';
-import { DOCS_URL } from '../../services/api';
+import { useState } from 'react';
+import { LogOut } from 'lucide-react';
 
 export function Navbar({
   user,
@@ -10,94 +9,72 @@ export function Navbar({
   onOpenAddProduct,
   onLogout,
 }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
-    <header className="navbar">
-      <div className="container navbar-content">
-        {/* Brand Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <a href="/" className="brand-logo">
-            <span className="brand-dot" />
-            <span>InfiShelf</span>
-            <span className="brand-badge">Enterprise Catalog</span>
-          </a>
+    <header className="wrap nav">
+      {/* Brand Logo */}
+      <a className="brand" href="#home" aria-label="InfiShelf home">
+        <span className="brand-mark">
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M5 8h22M5 16h22M5 24h22" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M7 16c0-6 7-7 9 0s9 6 9 0-7-7-9 0-9 6-9 0Z" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        </span>
+        <span>InfiShelf</span>
+      </a>
 
-          {/* Quick Counter */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '0.25rem 0.65rem',
-              background: 'var(--bg-surface-elevated)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-full)',
-              fontSize: '0.75rem',
-              color: 'var(--text-subtle)',
-            }}
-          >
-            <Layers size={12} color="var(--accent-primary)" />
-            <span>
-              <strong>{totalProducts}</strong> products
-            </span>
+      {/* Nav Links */}
+      <nav className={`navlinks ${isMenuOpen ? 'open' : ''}`} id="navlinks">
+        <a href="#platform" onClick={() => setIsMenuOpen(false)}>The platform</a>
+        <a href="#features" onClick={() => setIsMenuOpen(false)}>What you can do</a>
+        {!user && (
+          <div className="mobile-auth-links" style={{ display: 'none', flexDirection: 'column', gap: '8px', paddingTop: '10px', borderTop: '1px solid var(--line)' }}>
+            <button className="btn" onClick={() => { setIsMenuOpen(false); onOpenLogin(); }}>
+              Sign In
+            </button>
+            <button className="btn primary" onClick={() => { setIsMenuOpen(false); onOpenRegister(); }}>
+              Get Started ↗
+            </button>
           </div>
-        </div>
+        )}
+      </nav>
 
-        {/* Right Actions */}
-        <div className="navbar-actions">
-          {/* Swagger Docs Link */}
-          <a
-            href={DOCS_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-secondary btn-sm"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-          >
-            <FileCode2 size={14} />
-            <span>API Docs</span>
-          </a>
-
-          {/* User Auth Controls */}
-          {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div className="user-badge">
-                <span className="user-avatar">
-                  {user.username.charAt(0).toUpperCase()}
-                </span>
-                <span style={{ fontWeight: 600, color: 'var(--text-white)' }}>
-                  {user.username}
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={LogOut}
-                onClick={onLogout}
-                aria-label="Log out"
-              >
-                Logout
-              </Button>
+      {/* Right Actions */}
+      <div className="nav-actions">
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div className="user-badge" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span className="user-avatar" style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--blue-soft)', color: 'var(--blue)', display: 'grid', placeItems: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+                {user.username.charAt(0).toUpperCase()}
+              </span>
+              <span style={{ fontWeight: 600, color: 'var(--ink)' }}>
+                {user.username}
+              </span>
             </div>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={LogIn}
-                onClick={onOpenLogin}
-              >
-                Sign In
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                icon={UserPlus}
-                onClick={onOpenRegister}
-              >
-                Get Started
-              </Button>
-            </div>
-          )}
-        </div>
+            <button className="btn" onClick={onLogout} aria-label="Log out" style={{ padding: '8px 12px', fontSize: '13px' }}>
+              <LogOut size={15} />
+              <span>Logout</span>
+            </button>
+          </div>
+        ) : (
+          <>
+            <button className="btn" onClick={onOpenLogin}>
+              Sign In
+            </button>
+            <button className="btn primary" onClick={onOpenRegister}>
+              Get Started <span aria-hidden="true">↗</span>
+            </button>
+            <button
+              className="menu-toggle"
+              id="menuToggle"
+              aria-label="Open navigation"
+              onClick={() => setIsMenuOpen((prev) => !prev)}
+            >
+              ☰
+            </button>
+          </>
+        )}
       </div>
     </header>
   );

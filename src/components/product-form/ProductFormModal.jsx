@@ -11,9 +11,11 @@ export function ProductFormModal({
   isOpen,
   onClose,
   initialData,
+  productToEdit,
   onSuccess,
 }) {
-  const isEditing = Boolean(initialData?.id);
+  const activeProduct = initialData || productToEdit;
+  const isEditing = Boolean(activeProduct?.id);
   const { success, error: toastError } = useToast();
   const fileInputRef = useRef(null);
 
@@ -37,18 +39,21 @@ export function ProductFormModal({
   const [localPreview, setLocalPreview] = useState('');
 
   useEffect(() => {
-    if (initialData) {
+    const product = initialData || productToEdit;
+    if (product) {
       setFormData({
-        name: initialData.name || '',
-        brand: initialData.brand || '',
-        category: initialData.category || 'Beverages & Energy Drinks',
-        price: initialData.price ? String(initialData.price) : '',
-        image_url: initialData.image_url || '',
-        description: initialData.description || '',
-        tags: Array.isArray(initialData.tags) ? initialData.tags.join(', ') : '',
+        name: product.name || '',
+        brand: product.brand || '',
+        category: product.category || 'Beverages & Energy Drinks',
+        price: product.price ? String(product.price) : '',
+        image_url: product.image_url || '',
+        description: product.description || '',
+        tags: Array.isArray(product.tags) ? product.tags.join(', ') : '',
       });
-      setLocalPreview(initialData.image_url || '');
-      setImageMode(initialData.image_url?.startsWith('http') || initialData.image_url?.startsWith('/') ? 'url' : 'upload');
+      setLocalPreview(product.image_url || '');
+      setImageMode(
+        product.image_url?.startsWith('http') || product.image_url?.startsWith('/') ? 'url' : 'upload'
+      );
     } else {
       setFormData({
         name: '',
@@ -63,7 +68,7 @@ export function ProductFormModal({
       setImageMode('upload');
     }
     setErrors({});
-  }, [initialData, isOpen]);
+  }, [initialData, productToEdit, isOpen]);
 
   const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
@@ -182,13 +187,17 @@ export function ProductFormModal({
     if (!validate()) return;
 
     setLoading(true);
+    const activeProduct = initialData || productToEdit;
 
     const payload = {
       name: formData.name.trim(),
       brand: formData.brand.trim(),
       category: formData.category,
       price: Number(formData.price).toFixed(2),
-      image_url: formData.image_url.trim() || undefined,
+      image_url:
+        formData.image_url.trim() ||
+        activeProduct?.image_url ||
+        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
       description: formData.description.trim(),
       tags: formData.tags
         ? formData.tags
@@ -199,8 +208,8 @@ export function ProductFormModal({
     };
 
     try {
-      if (isEditing) {
-        await productService.updateProduct(initialData.id, payload);
+      if (isEditing && activeProduct?.id) {
+        await productService.updateProduct(activeProduct.id, payload);
         success(`"${payload.name}" updated successfully!`);
       } else {
         await productService.createProduct(payload);
@@ -212,12 +221,23 @@ export function ProductFormModal({
       console.error('Save product error:', err);
       const resp = err.response?.data;
       let msg = 'Failed to save product. Please check input fields.';
-      if (resp && typeof resp === 'object') {
-        const firstKey = Object.keys(resp)[0];
-        if (Array.isArray(resp[firstKey])) {
-          msg = `${firstKey}: ${resp[firstKey].join(' ')}`;
-        } else if (typeof resp[firstKey] === 'string') {
-          msg = resp[firstKey];
+      if (resp) {
+        if (typeof resp === 'string' && !resp.trim().startsWith('<')) {
+          msg = resp;
+        } else if (resp.message && typeof resp.message === 'string') {
+          msg = resp.message;
+        } else if (resp.errors && typeof resp.errors === 'object') {
+          const firstKey = Object.keys(resp.errors)[0];
+          msg = Array.isArray(resp.errors[firstKey])
+            ? `${firstKey}: ${resp.errors[firstKey].join(' ')}`
+            : String(resp.errors[firstKey]);
+        } else if (typeof resp === 'object') {
+          const firstKey = Object.keys(resp).find((k) => k !== 'success');
+          if (firstKey) {
+            msg = Array.isArray(resp[firstKey])
+              ? `${firstKey}: ${resp[firstKey].join(' ')}`
+              : String(resp[firstKey]);
+          }
         }
       }
       toastError(msg);
@@ -233,7 +253,7 @@ export function ProductFormModal({
       title={isEditing ? 'Edit Product' : 'Add New Product'}
       subtitle={
         isEditing
-          ? `Updating product ID: ${initialData.id}`
+          ? `Updating product: ${activeProduct?.name || activeProduct?.id}`
           : 'Create a new CPG product record with optional AI description generation.'
       }
       maxWidth="680px"
@@ -281,7 +301,7 @@ export function ProductFormModal({
           </div>
 
           <Input
-            label="Price (Rs.)"
+            label="Price (₹)"
             name="price"
             type="number"
             step="0.01"
@@ -397,7 +417,7 @@ export function ProductFormModal({
               onClick={handleGenerateAiDescription}
               title="Auto-generate e-commerce description and tags using Gemini GenAI"
             >
-              {aiGenerating ? 'Generating with AI...' : '✨ Generate with AI'}
+              {aiGenerating ? 'Generating with AI...' : 'Generate with AI'}
             </Button>
           </div>
 

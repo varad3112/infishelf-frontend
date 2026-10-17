@@ -1,0 +1,12 @@
+<svg viewBox="0 0 440 330" role="img" aria-label="Illustration of natural language search finding relevant products">
+          <ellipse cx="220" cy="286" rx="158" ry="15" fill="#dbeafe"/>
+          <rect x="62" y="51" width="316" height="218" rx="22" fill="#fff" stroke="#dbeafe" stroke-width="2"/>
+          <rect x="82" y="72" width="276" height="48" rx="12" fill="#f8fafc" stroke="#cbd5e1"/><circle cx="103" cy="95" r="7" fill="none" stroke="#64748b" stroke-width="2.5"/><path d="m108 100 6 6" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"/><path d="M128 95h168" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/><circle cx="335" cy="95" r="12" fill="#2563eb"/><path d="M330 95h10M335 90v10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <g><rect x="82" y="139" width="82" height="107" rx="12" fill="#eff6ff"/><rect x="177" y="139" width="82" height="107" rx="12" fill="#eef2ff"/><rect x="272" y="139" width="86" height="107" rx="12" fill="#f1f5f9"/></g>
+          <g transform="translate(101 153)"><rect x="6" y="12" width="31" height="49" rx="7" fill="#38bdf8"/><rect x="13" y="3" width="17" height="14" rx="4" fill="#2563eb"/><rect x="12" y="27" width="19" height="14" rx="3" fill="#dbeafe"/></g>
+          <g transform="translate(197 151)"><path d="M14 7h25l4 13v43H10V20Z" fill="#818cf8"/><rect x="18" y="1" width="17" height="9" rx="3" fill="#4f46e5"/><rect x="15" y="30" width="23" height="14" rx="3" fill="#e0e7ff"/></g>
+          <g transform="translate(292 154)"><rect x="5" y="10" width="42" height="48" rx="5" fill="#2563eb"/><path d="M5 22h42" stroke="#93c5fd" stroke-width="3"/><rect x="14" y="31" width="24" height="15" rx="2" fill="#bfdbfe"/></g>
+          <g stroke="#94a3b8" stroke-width="4" stroke-linecap="round"><path d="M92 229h61"/><path d="M187 229h61"/><path d="M282 229h65"/></g>
+          <path d="M118 40c20-20 47-21 65-7" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 7"/><path d="m175 25 11 8-12 4" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="244" y="24" width="116" height="34" rx="17" fill="#dcfce7" stroke="#a7f3d0"/><circle cx="260" cy="41" r="4" fill="#059669"/><path d="M272 41h74" stroke="#059669" stroke-width="4" stroke-linecap="round"/>
+        </svg>

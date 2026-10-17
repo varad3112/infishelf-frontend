@@ -78,7 +78,7 @@ export function ProductCard({
 
         {/* Footer with Price and CTAs */}
         <div className="card-footer">
-          <span className="card-price">Rs. {formattedPrice}</span>
+          <span className="card-price tabular-nums" style={{ whiteSpace: 'nowrap' }}>₹{formattedPrice}</span>
 
           <div className="card-actions">
             <button

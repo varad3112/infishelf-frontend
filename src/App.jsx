@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { FileCode2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { useToast } from './context/ToastContext';
 import { useProducts } from './hooks/useProducts';
@@ -8,7 +7,6 @@ import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { Footer } from './components/layout/Footer';
 import { Button } from './components/common/Button';
-import { DOCS_URL } from './services/api';
 
 import { DashboardView } from './components/dashboard/DashboardView';
 import { ManageCatalogView } from './components/catalog/ManageCatalogView';
@@ -19,6 +17,9 @@ import { RegisterModal } from './components/auth/RegisterModal';
 import { ProductDetailModal } from './components/product-detail/ProductDetailModal';
 import { ProductFormModal } from './components/product-form/ProductFormModal';
 import { DeleteConfirmModal } from './components/product-form/DeleteConfirmModal';
+import { BulkUploadModal } from './components/catalog/BulkUploadModal';
+import { Bot } from 'lucide-react';
+import { CatalogAssistantDrawer } from './components/assistant/CatalogAssistantDrawer';
 
 export default function App() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -49,7 +50,9 @@ export default function App() {
   const [detailProduct, setDetailProduct] = useState(null);
   const [formProduct, setFormProduct] = useState(null); // null = Add, object = Edit
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [deleteProduct, setDeleteProduct] = useState(null);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
 
   const handleOpenAddProduct = () => {
     if (!isAuthenticated) {
@@ -58,6 +61,14 @@ export default function App() {
     }
     setFormProduct(null);
     setIsFormOpen(true);
+  };
+
+  const handleOpenBulkUpload = () => {
+    if (!isAuthenticated) {
+      setLoginOpen(true);
+      return;
+    }
+    setBulkUploadOpen(true);
   };
 
   const handleEditProduct = (prod) => {
@@ -101,7 +112,12 @@ export default function App() {
           <div className={`main-workspace ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
             {/* Topbar Navigation Header */}
             <header className="workspace-topbar">
-              <div className="topbar-left">
+              <div className="topbar-left" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <img
+                  src="/logo.png"
+                  alt="InfiShelf"
+                  style={{ width: '20px', height: '20px', objectFit: 'contain', borderRadius: 'var(--radius-xs)' }}
+                />
                 <span className="topbar-crumb-app">InfiShelf</span>
                 <span className="topbar-crumb-sep">/</span>
                 <span className="topbar-crumb-view">
@@ -110,18 +126,18 @@ export default function App() {
                 </span>
               </div>
 
-              <div className="topbar-right">
-                <a
-                  href={DOCS_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-secondary btn-sm"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                  title="View Swagger / OpenAPI Documentation"
+              {/* Right Upper Corner Action */}
+              <div className="topbar-right" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <button
+                  type="button"
+                  className={`topbar-assistant-btn ${isAssistantOpen ? 'active' : ''}`}
+                  onClick={() => setIsAssistantOpen((prev) => !prev)}
+                  title={isAssistantOpen ? 'Close Assistant (Esc)' : 'Ask questions about your catalog in plain English'}
+                  aria-label="Toggle Catalog Assistant"
                 >
-                  <FileCode2 size={14} />
-                  <span>API Docs</span>
-                </a>
+                  <Bot size={15} />
+                  <span>{isAssistantOpen ? 'Close Assistant' : 'Ask Assistant'}</span>
+                </button>
               </div>
             </header>
 
@@ -151,6 +167,7 @@ export default function App() {
                   parsedIntent={parsedIntent}
                   canManage={true}
                   onOpenAddProduct={handleOpenAddProduct}
+                  onOpenBulkUpload={handleOpenBulkUpload}
                   onEditProduct={handleEditProduct}
                   onDeleteProduct={handleDeleteProduct}
                   onViewProduct={(p) => setDetailProduct(p)}
@@ -219,6 +236,7 @@ export default function App() {
       <ProductFormModal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
+        initialData={formProduct}
         productToEdit={formProduct}
         onSuccess={refetch}
       />
@@ -228,6 +246,22 @@ export default function App() {
         isOpen={Boolean(deleteProduct)}
         onClose={() => setDeleteProduct(null)}
         onSuccess={refetch}
+      />
+
+      <BulkUploadModal
+        isOpen={bulkUploadOpen}
+        onClose={() => setBulkUploadOpen(false)}
+        onSuccess={refetch}
+      />
+
+      {/* Enterprise Conversational Analytics Assistant ("Chat with Your Catalog") */}
+      <CatalogAssistantDrawer
+        isOpen={isAssistantOpen}
+        onClose={() => setIsAssistantOpen(false)}
+        onViewProduct={(p) => {
+          setIsAssistantOpen(false);
+          setDetailProduct(p);
+        }}
       />
     </div>
   );

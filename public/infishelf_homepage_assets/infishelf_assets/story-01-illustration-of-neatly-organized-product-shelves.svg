@@ -1,0 +1,14 @@
+<svg viewBox="0 0 440 330" role="img" aria-label="Illustration of neatly organized product shelves">
+          <defs><linearGradient id="shelfBlue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#60c9e7"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+          <ellipse cx="218" cy="294" rx="158" ry="14" fill="#dbeafe"/>
+          <g transform="translate(72 34)">
+            <path d="M25 34 238 0 286 28 73 63Z" fill="#bfdbfe"/><path d="M73 63 286 28v198L73 262Z" fill="#1e3a8a"/><path d="M25 34 73 63v199L25 231Z" fill="#2563eb"/>
+            <g fill="#eff6ff" stroke="#dbeafe" stroke-width="1"><path d="M35 44 238 12 273 31 70 64Z"/><path d="M35 98 238 66 273 85 70 118Z"/><path d="M35 152 238 120 273 139 70 172Z"/><path d="M35 206 238 174 273 193 70 226Z"/></g>
+            <g fill="url(#shelfBlue)"><path d="M48 24 67 21 67 53 48 56Z"/><path d="M81 19 100 16 100 48 81 51Z"/><path d="M114 14 133 11 133 43 114 46Z"/><path d="M147 9 166 6 166 38 147 41Z"/><path d="M180 4 199 1 199 33 180 36Z"/></g>
+            <g fill="#f8fafc"><path d="M49 78 66 75 66 108 49 111Z"/><path d="M79 73 96 70 96 103 79 106Z"/><path d="M109 68 126 65 126 98 109 101Z"/><path d="M139 63 156 60 156 93 139 96Z"/><path d="M169 58 186 55 186 88 169 91Z"/><path d="M199 53 216 50 216 83 199 86Z"/></g>
+            <g fill="#7dd3fc"><path d="M48 132 65 129 65 162 48 165Z"/><path d="M78 127 95 124 95 157 78 160Z"/><path d="M108 122 125 119 125 152 108 155Z"/><path d="M138 117 155 114 155 147 138 150Z"/><path d="M168 112 185 109 185 142 168 145Z"/><path d="M198 107 215 104 215 137 198 140Z"/></g>
+            <g fill="#f8fafc"><path d="M48 186 65 183 65 216 48 219Z"/><path d="M78 181 95 178 95 211 78 214Z"/><path d="M108 176 125 173 125 206 108 209Z"/><path d="M138 171 155 168 155 201 138 204Z"/><path d="M168 166 185 163 185 196 168 199Z"/><path d="M198 161 215 158 215 191 198 194Z"/></g>
+            <g fill="#2563eb"><path d="M25 88 238 54 286 82 73 117Z"/><path d="M25 142 238 108 286 136 73 171Z"/><path d="M25 196 238 162 286 190 73 225Z"/></g>
+          </g>
+          <g transform="translate(280 185)"><rect x="0" y="0" width="84" height="76" rx="13" fill="#fff" stroke="#bfdbfe" stroke-width="2"/><rect x="12" y="12" width="25" height="25" rx="6" fill="#dbeafe"/><path d="M18 28h13M24 21v14" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/><path d="M46 17h25M46 26h19M12 51h58M12 59h44" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/><circle cx="68" cy="11" r="5" fill="#059669"/></g>
+        </svg>

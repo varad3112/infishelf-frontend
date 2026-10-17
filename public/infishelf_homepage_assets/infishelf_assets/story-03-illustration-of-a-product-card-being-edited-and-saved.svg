@@ -1,0 +1,10 @@
+<svg viewBox="0 0 440 330" role="img" aria-label="Illustration of a product card being edited and saved">
+          <ellipse cx="218" cy="286" rx="154" ry="14" fill="#dbeafe"/>
+          <rect x="61" y="43" width="207" height="224" rx="18" fill="#fff" stroke="#cbd5e1" stroke-width="2"/>
+          <rect x="78" y="60" width="173" height="32" rx="8" fill="#eff6ff"/><circle cx="92" cy="76" r="4" fill="#2563eb"/><path d="M105 76h92" stroke="#93c5fd" stroke-width="4" stroke-linecap="round"/>
+          <rect x="79" y="105" width="75" height="84" rx="10" fill="#dbeafe"/><rect x="99" y="125" width="34" height="48" rx="7" fill="#38bdf8"/><rect x="108" y="117" width="16" height="11" rx="4" fill="#2563eb"/><path d="M91 180h50" stroke="#93c5fd" stroke-width="3" stroke-linecap="round"/>
+          <g stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"><path d="M169 115h70"/><path d="M169 130h55"/><path d="M169 154h70"/><path d="M169 169h49"/></g>
+          <rect x="79" y="204" width="172" height="43" rx="9" fill="#f8fafc" stroke="#e2e8f0"/><path d="M94 219h45M94 232h77" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+          <g transform="translate(244 127) rotate(7)"><rect x="0" y="0" width="133" height="144" rx="16" fill="#fff" stroke="#bfdbfe" stroke-width="2"/><rect x="14" y="14" width="105" height="61" rx="9" fill="#eff6ff"/><path d="M38 30h56v29H38Z" fill="#2563eb"/><path d="M38 39h56" stroke="#7dd3fc" stroke-width="4"/><path d="M16 91h96M16 105h72" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/><rect x="16" y="117" width="101" height="17" rx="8.5" fill="#dcfce7"/><path d="m29 125 4 4 7-8" stroke="#059669" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+          <circle cx="321" cy="83" r="23" fill="#2563eb"/><path d="m311 83 7 7 14-16" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>

@@ -34,42 +34,25 @@ export function useProducts() {
     setError(null);
 
     try {
-      if (isAiMode && filters.search.trim()) {
-        // Execute AI Smart Search
-        const data = await productService.smartSearch(filters.search.trim(), filters.page);
-        if (data.results) {
-          setProducts(data.results);
-          setPagination({
-            count: data.count || data.results.length,
-            total_pages: data.total_pages || 1,
-            current_page: data.current_page || 1,
-            page_size: data.page_size || 12,
-            next: data.next || null,
-            previous: data.previous || null,
-          });
-          setParsedIntent(data.parsed_intent || null);
-        }
-      } else {
-        // Execute Standard Filtering / Search
-        setParsedIntent(null);
-        const data = await productService.getProducts(filters);
-        setProducts(data.results || []);
-        setPagination({
-          count: data.count || 0,
-          total_pages: data.total_pages || 1,
-          current_page: data.current_page || 1,
-          page_size: data.page_size || 12,
-          next: data.next,
-          previous: data.previous,
-        });
-      }
+      const data = await productService.getProducts(filters);
+      setProducts(data.results || []);
+      setPagination({
+        count: data.count || 0,
+        total_pages: data.total_pages || 1,
+        current_page: data.current_page || 1,
+        page_size: data.page_size || 12,
+        next: data.next,
+        previous: data.previous,
+      });
+      // If backend fell back to internal LLM search, it returns parsed_intent
+      setParsedIntent(data.parsed_intent || null);
     } catch (err) {
       console.error('Failed to load products:', err);
       setError(err.response?.data?.detail || err.message || 'Failed to fetch catalog.');
     } finally {
       setLoading(false);
     }
-  }, [filters, isAiMode]);
+  }, [filters]);
 
   useEffect(() => {
     fetchProducts();

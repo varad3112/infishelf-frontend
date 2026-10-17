@@ -4,6 +4,7 @@ import {
   Filter,
   ArrowUpDown,
   PlusCircle,
+  Upload,
   Eye,
   Edit2,
   Trash2,
@@ -34,6 +35,7 @@ export function ManageCatalogView({
   parsedIntent = null,
   canManage = true,
   onOpenAddProduct,
+  onOpenBulkUpload,
   onEditProduct,
   onDeleteProduct,
   onViewProduct,
@@ -41,6 +43,7 @@ export function ManageCatalogView({
   const [searchInput, setSearchInput] = useState(filters.search || '');
   const [minPriceInput, setMinPriceInput] = useState(filters.min_price || '');
   const [maxPriceInput, setMaxPriceInput] = useState(filters.max_price || '');
+  const [previewImage, setPreviewImage] = useState(null);
 
   // Keep local inputs synchronized when external filters change (e.g. on reset)
   useEffect(() => {
@@ -87,27 +90,42 @@ export function ManageCatalogView({
 
   return (
     <div className="manage-catalog-container">
-      {/* Page Title & Main Action Header */}
+      {/* Top Main Action Header */}
       <div className="manage-catalog-header">
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <h1 className="manage-title">Product Catalog</h1>
-            <Badge variant="primary">{pagination.count || products.length} SKUs Listed</Badge>
-          </div>
-          <p className="manage-subtitle">
-            Manage product inventory, category allocations, SKU pricing, and smart natural language search.
-          </p>
+        <div className="manage-header-title-wrap">
+          <span className="manage-catalog-count-badge">
+            <Package size={14} style={{ color: 'var(--accent-primary)' }} />
+            <span>{pagination.count ?? products.length} SKUs</span>
+          </span>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          icon={PlusCircle}
-          onClick={onOpenAddProduct}
-          style={{ fontWeight: 700 }}
-        >
-          Add Product
-        </Button>
+        <div className="manage-header-actions">
+          {canManage && (
+            <>
+              <Button
+                variant="secondary"
+                size="md"
+                icon={Upload}
+                onClick={onOpenBulkUpload}
+                className="btn-bulk-upload"
+                title="Bulk upload products from CSV file"
+              >
+                Import CSV
+              </Button>
+
+              <Button
+                variant="primary"
+                size="md"
+                icon={PlusCircle}
+                onClick={onOpenAddProduct}
+                className="btn-add-product"
+                style={{ fontWeight: 700 }}
+              >
+                Add Product
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Primary Toolbar: Search + AI Toggle + Filters */}
@@ -119,11 +137,7 @@ export function ManageCatalogView({
             <input
               type="text"
               className="manage-search-input"
-              placeholder={
-                isAiMode
-                  ? "Natural language query (e.g. 'cold beverages under 50', 'healthy snacks')..."
-                  : "Search products by name, brand, or SKU..."
-              }
+              placeholder="Search products by name, brand, SKU, or natural description..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
@@ -143,20 +157,6 @@ export function ManageCatalogView({
           <Button type="submit" variant="secondary" size="sm">
             Search
           </Button>
-
-          {/* AI Mode Toggle Button */}
-          {toggleAiMode && (
-            <button
-              type="button"
-              className={`manage-ai-toggle-btn ${isAiMode ? 'active' : ''}`}
-              onClick={toggleAiMode}
-              title={isAiMode ? 'Smart search active (click for standard search)' : 'Switch to natural language smart search'}
-              aria-label="Toggle Natural Language Search"
-            >
-              <Sparkles size={14} />
-              <span>{isAiMode ? 'Smart Active' : 'Smart Search'}</span>
-            </button>
-          )}
         </form>
 
         {/* Filter Controls: Category + Price Bounds + Sorter */}
@@ -179,9 +179,9 @@ export function ManageCatalogView({
           </div>
 
           {/* Price Range Filter Inputs */}
-          <div className="manage-price-inputs" title="Filter by price in Rs.">
+          <div className="manage-price-inputs" title="Filter by price in ₹">
             <div className="price-input-wrap">
-              <span className="price-currency">Rs.</span>
+              <span className="price-currency">₹</span>
               <input
                 type="number"
                 placeholder="Min"
@@ -197,7 +197,7 @@ export function ManageCatalogView({
             </div>
             <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>–</span>
             <div className="price-input-wrap">
-              <span className="price-currency">Rs.</span>
+              <span className="price-currency">₹</span>
               <input
                 type="number"
                 placeholder="Max"
@@ -250,11 +250,11 @@ export function ManageCatalogView({
       </div>
 
       {/* AI Smart Search Intent Banner */}
-      {isAiMode && parsedIntent && (
+      {parsedIntent && (
         <section className="ai-intent-banner">
           <div className="intent-header">
             <Sparkles size={18} className="intent-icon" />
-            <span className="intent-title">Parsed Query Intent</span>
+            <span className="intent-title">AI Semantic Search Intent</span>
           </div>
           <div className="intent-badges">
             {parsedIntent.category && (
@@ -264,10 +264,10 @@ export function ManageCatalogView({
               <span className="intent-badge">Brand: {parsedIntent.brand}</span>
             )}
             {parsedIntent.max_price && (
-              <span className="intent-badge">Under Rs. {parsedIntent.max_price}</span>
+              <span className="intent-badge">Under ₹{parsedIntent.max_price}</span>
             )}
             {parsedIntent.min_price && (
-              <span className="intent-badge">Above Rs. {parsedIntent.min_price}</span>
+              <span className="intent-badge">Above ₹{parsedIntent.min_price}</span>
             )}
             {parsedIntent.keywords && parsedIntent.keywords.length > 0 && (
               <span className="intent-badge">Keywords: {parsedIntent.keywords.join(', ')}</span>
@@ -313,17 +313,18 @@ export function ManageCatalogView({
 
       {/* Product List Table */}
       <div className="manage-table-card">
-        <div className="manage-table-responsive">
+        {/* Desktop Table View (>= 768px) */}
+        <div className="manage-table-responsive desktop-only-table">
           <table className="manage-table">
             <thead>
               <tr>
-                <th style={{ width: '64px' }}>Packshot</th>
-                <th>Product Name & Brand</th>
-                <th>Category Aisle</th>
-                <th>Price (Rs.)</th>
-                <th>Semantic Tags</th>
-                <th>Created</th>
-                <th style={{ textAlign: 'right', minWidth: '150px' }}>Actions</th>
+                <th style={{ width: '56px', minWidth: '56px' }}>Packshot</th>
+                <th style={{ minWidth: '220px' }}>Product Name & Brand</th>
+                <th style={{ width: '140px', minWidth: '140px' }}>Category Aisle</th>
+                <th style={{ width: '115px', minWidth: '115px', whiteSpace: 'nowrap' }}>Unit Price</th>
+                <th style={{ width: '160px', minWidth: '160px' }}>Semantic Tags</th>
+                <th style={{ width: '100px', minWidth: '100px', whiteSpace: 'nowrap' }}>Created</th>
+                <th style={{ width: '120px', minWidth: '120px', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -360,7 +361,7 @@ export function ManageCatalogView({
                     <div className="manage-empty-state">
                       <Package size={40} style={{ color: 'var(--text-muted)', marginBottom: '0.65rem' }} />
                       <h3 style={{ fontSize: '1.1rem', marginBottom: '0.35rem' }}>
-                        {isAiMode ? 'No products matched AI search' : 'No products found'}
+                        No products found
                       </h3>
                       <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', maxWidth: '400px', margin: '0 auto 1rem' }}>
                         {filters.search
@@ -389,7 +390,16 @@ export function ManageCatalogView({
                   <tr key={item.id} className="manage-table-row">
                     {/* Thumbnail Packshot */}
                     <td>
-                      <div className="table-thumb-wrap">
+                      <div
+                        className="table-thumb-wrap clickable-thumb"
+                        onClick={() => setPreviewImage({ url: item.image_url, name: item.name })}
+                        title="Click to view full packshot image"
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') setPreviewImage({ url: item.image_url, name: item.name });
+                        }}
+                      >
                         <img
                           src={item.image_url || '/placeholder.png'}
                           alt={item.name}
@@ -409,7 +419,7 @@ export function ManageCatalogView({
                           type="button"
                           className="table-product-name-btn"
                           onClick={() => onViewProduct(item)}
-                          title="Click to view full product details"
+                          title={item.name}
                         >
                           {item.name}
                         </button>
@@ -422,10 +432,10 @@ export function ManageCatalogView({
                       <span className="table-cat-badge">{item.category}</span>
                     </td>
 
-                    {/* Price */}
+                    {/* Unit Price */}
                     <td>
-                      <span className="table-price-bold">
-                        Rs. {Number(item.price).toFixed(2)}
+                      <span className="table-price-bold tabular-nums" style={{ whiteSpace: 'nowrap' }}>
+                        ₹{Number(item.price).toFixed(2)}
                       </span>
                     </td>
 
@@ -449,7 +459,7 @@ export function ManageCatalogView({
 
                     {/* Created Date */}
                     <td>
-                      <span className="table-date-text">
+                      <span className="table-date-text tabular-nums">
                         {item.created_at ? new Date(item.created_at).toLocaleDateString() : '—'}
                       </span>
                     </td>
@@ -488,6 +498,119 @@ export function ManageCatalogView({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Genuine Mobile Card View (< 768px) */}
+        <div className="manage-mobile-list mobile-only-list">
+          {loading ? (
+            Array.from({ length: 4 }).map((_, idx) => (
+              <div key={idx} className="manage-mobile-card skeleton-card" style={{ height: '110px' }} />
+            ))
+          ) : products.length === 0 ? (
+            <div className="manage-empty-state" style={{ padding: '2.5rem 1rem' }}>
+              <Package size={36} style={{ color: 'var(--text-muted)', marginBottom: '0.5rem' }} />
+              <h3 style={{ fontSize: '1rem', marginBottom: '0.25rem' }}>
+                No products found
+              </h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: '0 auto 1rem' }}>
+                Try adjusting search keywords or price bounds.
+              </p>
+              {hasActiveFilters && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setSearchInput('');
+                    setMinPriceInput('');
+                    setMaxPriceInput('');
+                    resetFilters();
+                  }}
+                >
+                  Reset Filters
+                </Button>
+              )}
+            </div>
+          ) : (
+            products.map((item) => (
+              <div key={item.id} className="manage-mobile-card">
+                <div className="mobile-card-top">
+                  <div
+                    className="mobile-card-thumb-wrap clickable-thumb"
+                    onClick={() => setPreviewImage({ url: item.image_url, name: item.name })}
+                    title="Click to view full packshot image"
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <img
+                      src={item.image_url || '/placeholder.png'}
+                      alt={item.name}
+                      className="mobile-card-thumb-img"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80';
+                      }}
+                    />
+                  </div>
+                  <div className="mobile-card-details">
+                    <button
+                      type="button"
+                      className="mobile-card-title-btn"
+                      onClick={() => onViewProduct(item)}
+                    >
+                      {item.name}
+                    </button>
+                    <span className="mobile-card-brand">{item.brand}</span>
+                    <div className="mobile-card-badge-row">
+                      <span className="table-cat-badge">{item.category}</span>
+                      <span className="mobile-card-price tabular-nums">₹{Number(item.price).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mobile-card-bottom">
+                  <div className="table-tags-wrap">
+                    {Array.isArray(item.tags) && item.tags.length > 0 ? (
+                      item.tags.slice(0, 2).map((tag) => (
+                        <span key={tag} className="table-tag-pill">
+                          #{tag}
+                        </span>
+                      ))
+                    ) : null}
+                    {item.tags?.length > 2 && (
+                      <span className="table-tag-more">+{item.tags.length - 2}</span>
+                    )}
+                  </div>
+
+                  <div className="table-action-buttons">
+                    <button
+                      className="table-action-icon-btn view"
+                      onClick={() => onViewProduct(item)}
+                      title="View Details"
+                      aria-label="View Details"
+                    >
+                      <Eye size={15} />
+                    </button>
+                    <button
+                      className="table-action-icon-btn edit"
+                      onClick={() => onEditProduct(item)}
+                      title="Edit Product"
+                      aria-label="Edit Product"
+                    >
+                      <Edit2 size={15} />
+                    </button>
+                    <button
+                      className="table-action-icon-btn delete"
+                      onClick={() => onDeleteProduct(item)}
+                      title="Delete Product"
+                      aria-label="Delete Product"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Table Pagination Bar */}
@@ -547,6 +670,54 @@ export function ManageCatalogView({
           </div>
         )}
       </div>
+
+      {/* Packshot Image Lightbox Modal */}
+      {previewImage && (
+        <div
+          className="image-lightbox-overlay"
+          onClick={() => setPreviewImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Packshot Image Preview"
+        >
+          <div className="image-lightbox-card" onClick={(e) => e.stopPropagation()}>
+            <div className="image-lightbox-header">
+              <span className="image-lightbox-title" title={previewImage.name}>
+                {previewImage.name}
+              </span>
+              <button
+                type="button"
+                className="image-lightbox-close"
+                onClick={() => setPreviewImage(null)}
+                aria-label="Close Preview"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <div className="image-lightbox-body">
+              <img
+                src={previewImage.url || '/placeholder.png'}
+                alt={previewImage.name}
+                className="image-lightbox-img"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80';
+                }}
+              />
+            </div>
+            <div className="image-lightbox-footer">
+              <span className="image-lightbox-hint">Packshot Product Asset</span>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setPreviewImage(null)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

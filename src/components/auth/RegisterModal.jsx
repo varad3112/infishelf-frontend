@@ -32,6 +32,12 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setFormError('Please enter a valid email address (e.g. name@example.com).');
+      return;
+    }
+
     if (password !== passwordConfirm) {
       setFormError('Passwords do not match.');
       return;
@@ -46,7 +52,7 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     setFormError('');
 
     try {
-      await register(username, email, password, passwordConfirm);
+      await register(username.trim(), email.trim().toLowerCase(), password, passwordConfirm);
       success('Account created successfully! Welcome to InfiShelf.');
       onClose();
       setFormData({ username: '', email: '', password: '', passwordConfirm: '' });
@@ -55,11 +61,26 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       let msg = 'Registration failed. Please check your information.';
       if (respData) {
         if (typeof respData === 'string') {
-          msg = respData;
-        } else if (respData.detail) {
+          msg = respData.trim().startsWith('<')
+            ? 'Server error occurred. Please try again shortly.'
+            : respData;
+        } else if (respData.message && typeof respData.message === 'string') {
+          msg = respData.message;
+        } else if (respData.detail && typeof respData.detail === 'string') {
           msg = respData.detail;
+        } else if (respData.errors && typeof respData.errors === 'object') {
+          const errorEntries = Object.entries(respData.errors)
+            .map(([field, errors]) => {
+              const fieldName = field.replace('_', ' ');
+              const errorText = Array.isArray(errors) ? errors.join(' ') : String(errors);
+              return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}: ${errorText}`;
+            });
+          if (errorEntries.length > 0) {
+            msg = errorEntries.join(' | ');
+          }
         } else if (typeof respData === 'object') {
           const errorEntries = Object.entries(respData)
+            .filter(([key]) => key !== 'success')
             .map(([field, errors]) => {
               const fieldName = field.replace('_', ' ');
               const errorText = Array.isArray(errors) ? errors.join(' ') : String(errors);
@@ -84,6 +105,14 @@ export function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       title="Create InfiShelf Account"
       subtitle="Register to publish, edit, and orchestrate AI product catalogs."
     >
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+        <img
+          src="/logo.png"
+          alt="InfiShelf Logo"
+          style={{ width: '44px', height: '44px', objectFit: 'contain' }}
+        />
+      </div>
+
       <form onSubmit={handleSubmit}>
         {formError && (
           <div

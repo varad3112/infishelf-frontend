@@ -72,21 +72,12 @@ export function DashboardView({ onNavigateToManage, onOpenAddProduct, onViewProd
 
   // Pre-calculate percentages for max visual bar width
   const maxCategoryCount = Math.max(...(stats.category_distribution?.map((c) => c.count) || [1]), 1);
-  const maxBrandCount = Math.max(...(stats.brand_distribution?.map((b) => b.count) || [1]), 1);
 
   return (
     <div className="dashboard-container">
       {/* Top Header & Actions */}
       <div className="dashboard-header">
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <h1 className="dashboard-title">Catalog Intelligence Dashboard</h1>
-            <span className="live-pulse-badge">Live System</span>
-          </div>
-          <p className="dashboard-subtitle">
-            Real-time analytics, aisle distributions, pricing tiers, and inventory valuations.
-          </p>
-        </div>
+
 
         <div className="dashboard-header-actions">
           <Button
@@ -113,207 +104,219 @@ export function DashboardView({ onNavigateToManage, onOpenAddProduct, onViewProd
             size="sm"
             icon={PlusCircle}
             onClick={onOpenAddProduct}
-            style={{ fontWeight: 700 }}
+            style={{ fontWeight: 600 }}
           >
             Add Product
           </Button>
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="kpi-grid">
-        {/* Total Products */}
-        <div className="kpi-card">
-          <div className="kpi-icon-wrap" style={{ background: '#eff6ff', color: '#2563eb' }}>
-            <Package size={22} />
-          </div>
-          <div className="kpi-content">
-            <span className="kpi-label">Total Products</span>
-            <span className="kpi-value">{stats.total_products}</span>
+      {/* 01 — KEY METRICS */}
+      <section className="dashboard-section">
+        <div className="dashboard-section-label">01 — KEY METRICS</div>
+        <div className="kpi-grid">
+          {/* Total Products */}
+          <div className="kpi-card">
+            <div className="kpi-card-header">
+              <span className="kpi-label">Total Products</span>
+              <div className="kpi-icon-pill" style={{ background: '#eff6ff', color: '#2563eb' }}>
+                <Package size={16} />
+              </div>
+            </div>
+            <div className="kpi-value tabular-nums">{stats.total_products}</div>
             <span className="kpi-meta">Active shelf SKUs</span>
           </div>
-        </div>
 
-        {/* Categories */}
-        <div className="kpi-card">
-          <div className="kpi-icon-wrap" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
-            <Layers size={22} />
-          </div>
-          <div className="kpi-content">
-            <span className="kpi-label">Active Aisles</span>
-            <span className="kpi-value">{stats.total_categories}</span>
+          {/* Active Aisles */}
+          <div className="kpi-card">
+            <div className="kpi-card-header">
+              <span className="kpi-label">Active Aisles</span>
+              <div className="kpi-icon-pill" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
+                <Layers size={16} />
+              </div>
+            </div>
+            <div className="kpi-value tabular-nums">{stats.total_categories}</div>
             <span className="kpi-meta">Distinct categories</span>
           </div>
-        </div>
 
-        {/* Brands */}
-        <div className="kpi-card">
-          <div className="kpi-icon-wrap" style={{ background: '#ecfdf5', color: '#059669' }}>
-            <Building2 size={22} />
-          </div>
-          <div className="kpi-content">
-            <span className="kpi-label">FMCG Brands</span>
-            <span className="kpi-value">{stats.total_brands}</span>
+          {/* FMCG Brands */}
+          <div className="kpi-card">
+            <div className="kpi-card-header">
+              <span className="kpi-label">FMCG Brands</span>
+              <div className="kpi-icon-pill" style={{ background: '#ecfdf5', color: '#059669' }}>
+                <Building2 size={16} />
+              </div>
+            </div>
+            <div className="kpi-value tabular-nums">{stats.total_brands}</div>
             <span className="kpi-meta">Manufacturers listed</span>
           </div>
-        </div>
 
-        {/* Average Price */}
-        <div className="kpi-card">
-          <div className="kpi-icon-wrap" style={{ background: '#fef3c7', color: '#d97706' }}>
-            <TrendingUp size={22} />
-          </div>
-          <div className="kpi-content">
-            <span className="kpi-label">Average Price</span>
-            <span className="kpi-value">Rs. {Number(stats.average_price).toFixed(2)}</span>
+          {/* Average Price */}
+          <div className="kpi-card">
+            <div className="kpi-card-header">
+              <span className="kpi-label">Average Price</span>
+              <div className="kpi-icon-pill" style={{ background: '#fef3c7', color: '#d97706' }}>
+                <TrendingUp size={16} />
+              </div>
+            </div>
+            <div className="kpi-value tabular-nums">
+              ₹{Number(stats.average_price).toFixed(2)}
+            </div>
             <span className="kpi-meta">Across all items</span>
           </div>
-        </div>
 
-        {/* Total Inventory Value */}
-        <div className="kpi-card">
-          <div className="kpi-icon-wrap" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
-            <DollarSign size={22} />
-          </div>
-          <div className="kpi-content">
-            <span className="kpi-label">Catalog Valuation</span>
-            <span className="kpi-value">Rs. {Number(stats.total_inventory_value).toFixed(2)}</span>
+          {/* Catalog Valuation */}
+          <div className="kpi-card">
+            <div className="kpi-card-header">
+              <span className="kpi-label">Catalog Valuation</span>
+              <div className="kpi-icon-pill" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
+                <DollarSign size={16} />
+              </div>
+            </div>
+            <div className="kpi-value tabular-nums" title={`₹${Number(stats.total_inventory_value).toFixed(2)}`}>
+              ₹{Number(stats.total_inventory_value).toFixed(2)}
+            </div>
             <span className="kpi-meta">Sum of unit prices</span>
           </div>
-        </div>
 
-        {/* Price Range */}
-        <div className="kpi-card">
-          <div className="kpi-icon-wrap" style={{ background: '#f1f5f9', color: '#475569' }}>
-            <Tag size={22} />
-          </div>
-          <div className="kpi-content">
-            <span className="kpi-label">Price Range</span>
-            <span className="kpi-value" style={{ fontSize: '1.25rem' }}>
-              Rs. {stats.min_price} – {stats.max_price}
-            </span>
-            <span className="kpi-meta">Min to Max unit cost</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Visualizations Section */}
-      <div className="dashboard-grid-2col">
-        {/* Category Breakdown Visualizer */}
-        <div className="dashboard-panel">
-          <div className="panel-header">
-            <div>
-              <h2 className="panel-title">Category Distribution</h2>
-              <span className="panel-subtitle">Product allocation across retail aisles</span>
+          {/* Price Range */}
+          <div className="kpi-card">
+            <div className="kpi-card-header">
+              <span className="kpi-label">Price Range</span>
+              <div className="kpi-icon-pill" style={{ background: '#f1f5f9', color: '#475569' }}>
+                <Tag size={16} />
+              </div>
             </div>
-            <Badge variant="primary">{stats.category_distribution?.length || 0} Aisles</Badge>
+            <div className="kpi-value tabular-nums price-range-val" title={`₹${stats.min_price}–${stats.max_price}`}>
+              ₹{stats.min_price}–{stats.max_price}
+            </div>
+            <span className="kpi-meta">Min to max</span>
           </div>
+        </div>
+      </section>
 
-          <div className="category-bars-list">
-            {stats.category_distribution?.map((cat) => {
-              const widthPct = Math.round((cat.count / maxCategoryCount) * 100);
-              return (
-                <div key={cat.category} className="category-bar-item">
-                  <div className="bar-labels">
-                    <span className="bar-name">{cat.category}</span>
-                    <div className="bar-meta-right">
-                      <span className="bar-count">{cat.count} items</span>
-                      <span className="bar-pct">({cat.percentage}%)</span>
-                      <span className="bar-avg">Avg: Rs. {cat.avg_price}</span>
+      {/* 02 — ANALYTICS */}
+      <section className="dashboard-section">
+        <div className="dashboard-section-label">02 — ANALYTICS</div>
+        <div className="dashboard-grid-2col">
+          {/* Category Breakdown Visualizer */}
+          <div className="dashboard-panel">
+            <div className="panel-header">
+              <div>
+                <h2 className="panel-title">Category Distribution</h2>
+                <span className="panel-subtitle">Product allocation across retail aisles</span>
+              </div>
+              <Badge variant="primary">{stats.category_distribution?.length || 0} Aisles</Badge>
+            </div>
+
+            <div className="category-bars-list">
+              {stats.category_distribution?.map((cat) => {
+                const widthPct = Math.round((cat.count / maxCategoryCount) * 100);
+                return (
+                  <div key={cat.category} className="category-bar-item">
+                    <div className="bar-labels">
+                      <span className="bar-name">{cat.category}</span>
+                      <div className="bar-meta-right">
+                        <span className="bar-count tabular-nums">{cat.count} items</span>
+                        <span className="bar-pct tabular-nums">({cat.percentage}%)</span>
+                        <span className="bar-avg tabular-nums">Avg: ₹{cat.avg_price}</span>
+                      </div>
+                    </div>
+                    <div className="bar-track">
+                      <div
+                        className="bar-fill category-fill"
+                        style={{ width: `${widthPct}%` }}
+                      />
                     </div>
                   </div>
-                  <div className="bar-track">
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Price Tier Breakdown */}
+          <div className="dashboard-panel">
+            <div className="panel-header">
+              <div>
+                <h2 className="panel-title">Price Distribution</h2>
+                <span className="panel-subtitle">Catalog volume grouped by price tier</span>
+              </div>
+              <Badge variant="secondary">Price Tiers</Badge>
+            </div>
+
+            <div className="price-tiers-grid">
+              {stats.price_ranges?.map((tier) => (
+                <div key={tier.label} className="price-tier-card">
+                  <span className="tier-label">{tier.label.replace(/Rs\.\s*/g, '₹')}</span>
+                  <span className="tier-count tabular-nums">{tier.count}</span>
+                  <span className="tier-subtext">Products</span>
+                  <div className="tier-bar-track">
                     <div
-                      className="bar-fill category-fill"
-                      style={{ width: `${widthPct}%` }}
+                      className="tier-bar-fill"
+                      style={{
+                        width: `${stats.total_products > 0 ? (tier.count / stats.total_products) * 100 : 0}%`,
+                      }}
                     />
                   </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+
+            {/* Top Brands Visual Mini Ranking */}
+            <div className="brands-ranking-section">
+              <h3 className="brands-ranking-title">
+                TOP BRANDS BY SKU COUNT
+              </h3>
+              <div className="brand-pills-wrap">
+                {stats.brand_distribution?.map((b) => (
+                  <div key={b.brand} className="brand-pill">
+                    <span className="brand-name">{b.brand}</span>
+                    <span className="brand-badge-count tabular-nums">{b.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Price Tier Breakdown */}
+      {/* 03 — RECENTLY ADDED PRODUCTS */}
+      <section className="dashboard-section">
+        <div className="dashboard-section-label">03 — RECENTLY ADDED PRODUCTS</div>
         <div className="dashboard-panel">
           <div className="panel-header">
             <div>
-              <h2 className="panel-title">Price Tier Segments</h2>
-              <span className="panel-subtitle">Catalog volume grouped by price range</span>
+              <h2 className="panel-title">Recently Added Shelf Products</h2>
+              <span className="panel-subtitle">Latest items synced to the catalog</span>
             </div>
-            <Badge variant="secondary">Price Tiers</Badge>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={ArrowRight}
+              onClick={onNavigateToManage}
+            >
+              View All in Catalog
+            </Button>
           </div>
 
-          <div className="price-tiers-grid">
-            {stats.price_ranges?.map((tier) => (
-              <div key={tier.label} className="price-tier-card">
-                <span className="tier-label">{tier.label}</span>
-                <span className="tier-count">{tier.count}</span>
-                <span className="tier-subtext">Products</span>
-                <div className="tier-bar-track">
-                  <div
-                    className="tier-bar-fill"
-                    style={{
-                      width: `${stats.total_products > 0 ? (tier.count / stats.total_products) * 100 : 0}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Top Brands Visual Mini Ranking */}
-          <div style={{ marginTop: '1.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '0.75rem', fontWeight: 600 }}>
-              TOP BRANDS BY SKU COUNT
-            </h3>
-            <div className="brand-pills-wrap">
-              {stats.brand_distribution?.map((b) => (
-                <div key={b.brand} className="brand-pill">
-                  <span className="brand-name">{b.brand}</span>
-                  <span className="brand-badge-count">{b.count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Catalog Additions */}
-      <div className="dashboard-panel" style={{ marginTop: '1.5rem' }}>
-        <div className="panel-header">
-          <div>
-            <h2 className="panel-title">Recently Added Shelf Products</h2>
-            <span className="panel-subtitle">Latest items synced to the catalog</span>
-          </div>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={ArrowRight}
-            onClick={onNavigateToManage}
-          >
-            View All in Catalog
-          </Button>
-        </div>
-
-        <div className="recent-products-table-wrap">
-          <table className="recent-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Brand</th>
-                <th>Unit Price</th>
-                <th>Added</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.recent_products?.map((item) => (
-                <tr key={item.id}>
-                  <td>
-                    <div className="recent-item-info">
+          <div className="recent-products-table-wrap">
+            <table className="recent-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '48px' }}>Packshot</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Brand</th>
+                  <th>Unit Price</th>
+                  <th>Added</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.recent_products?.map((item) => (
+                  <tr key={item.id}>
+                    <td>
                       <img
                         src={item.image_url || '/placeholder.png'}
                         alt={item.name}
@@ -323,41 +326,43 @@ export function DashboardView({ onNavigateToManage, onOpenAddProduct, onViewProd
                           e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80';
                         }}
                       />
+                    </td>
+                    <td>
                       <span className="recent-item-name" title={item.name}>
                         {item.name}
                       </span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="table-cat-badge">{item.category}</span>
-                  </td>
-                  <td>
-                    <span className="table-brand-text">{item.brand}</span>
-                  </td>
-                  <td>
-                    <span className="table-price-text">Rs. {Number(item.price).toFixed(2)}</span>
-                  </td>
-                  <td>
-                    <span className="table-date-text">
-                      <Clock size={12} style={{ marginRight: 4, display: 'inline' }} />
-                      {new Date(item.created_at).toLocaleDateString()}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onViewProduct(item)}
-                    >
-                      Quick View
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    </td>
+                    <td>
+                      <span className="table-cat-badge">{item.category}</span>
+                    </td>
+                    <td>
+                      <span className="table-brand-text">{item.brand}</span>
+                    </td>
+                    <td>
+                      <span className="table-price-text tabular-nums">₹{Number(item.price).toFixed(2)}</span>
+                    </td>
+                    <td>
+                      <span className="table-date-text tabular-nums">
+                        <Clock size={12} style={{ marginRight: 4, display: 'inline' }} />
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onViewProduct(item)}
+                      >
+                        Quick View
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

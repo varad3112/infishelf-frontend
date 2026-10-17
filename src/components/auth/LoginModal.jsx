@@ -12,6 +12,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -26,16 +27,26 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setFormError('');
 
     try {
-      await login(username.trim(), password);
+      await login(username.trim(), password, rememberMe);
       success('Signed in successfully.');
       onClose();
       setUsername('');
       setPassword('');
+      setRememberMe(false);
     } catch (err) {
-      const msg =
-        err.response?.data?.detail ||
-        err.response?.data?.error ||
-        'Invalid username/email or password. Please try again.';
+      const respData = err.response?.data;
+      let msg = 'Invalid username/email or password. Please try again.';
+      if (respData) {
+        if (typeof respData === 'string' && !respData.trim().startsWith('<')) {
+          msg = respData;
+        } else if (respData.message && typeof respData.message === 'string') {
+          msg = respData.message;
+        } else if (respData.detail && typeof respData.detail === 'string') {
+          msg = respData.detail;
+        } else if (respData.error && typeof respData.error === 'string') {
+          msg = respData.error;
+        }
+      }
       setFormError(msg);
       toastError(msg);
     } finally {
@@ -50,6 +61,14 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
       title="Sign in to InfiShelf"
       subtitle="Access full catalog management, AI generation, and CRUD tools."
     >
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+        <img
+          src="/logo.png"
+          alt="InfiShelf Logo"
+          style={{ width: '44px', height: '44px', objectFit: 'contain' }}
+        />
+      </div>
+
       <form onSubmit={handleSubmit}>
         {formError && (
           <div
@@ -76,7 +95,7 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
           name="username"
           required
           autoFocus
-          placeholder="e.g. varad or varadk.official@gmail.com"
+          placeholder="username or user@example.com"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
@@ -91,7 +110,34 @@ export function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.85rem' }}>
+          <label
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.55rem',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              color: 'var(--text-white)',
+              userSelect: 'none',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              style={{
+                width: '16px',
+                height: '16px',
+                accentColor: 'var(--accent-primary)',
+                cursor: 'pointer',
+              }}
+            />
+            <span>Remember me (keep me logged in on this browser)</span>
+          </label>
+        </div>
+
+        <div style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <Button
             type="submit"
             variant="primary"

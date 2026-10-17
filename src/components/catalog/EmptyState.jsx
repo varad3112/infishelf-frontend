@@ -8,7 +8,7 @@ export function EmptyState({ onReset, isAiMode, search }) {
         <SearchX size={32} />
       </div>
       <h3 className="empty-title">
-        {isAiMode ? 'No matching products found with AI' : 'No products found'}
+        No products found
       </h3>
       <p className="empty-subtitle">
         {search ? (

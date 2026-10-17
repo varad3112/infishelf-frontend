@@ -1,5 +1,10 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authService } from '../services/authService';
+import {
+  getStoredAccessToken,
+  setStoredTokens,
+  clearStoredTokens,
+} from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -8,7 +13,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const fetchCurrentUser = useCallback(async () => {
-    const token = localStorage.getItem('infishelf_access_token');
+    const token = getStoredAccessToken();
     if (!token) {
       setUser(null);
       setLoading(false);
@@ -20,8 +25,7 @@ export function AuthProvider({ children }) {
       setUser(userData);
     } catch {
       setUser(null);
-      localStorage.removeItem('infishelf_access_token');
-      localStorage.removeItem('infishelf_refresh_token');
+      clearStoredTokens();
     } finally {
       setLoading(false);
     }
@@ -40,10 +44,9 @@ export function AuthProvider({ children }) {
     };
   }, [fetchCurrentUser]);
 
-  const login = async (username, password) => {
+  const login = async (username, password, remember = false) => {
     const data = await authService.login(username, password);
-    localStorage.setItem('infishelf_access_token', data.access);
-    localStorage.setItem('infishelf_refresh_token', data.refresh);
+    setStoredTokens(data.access, data.refresh, remember);
     await fetchCurrentUser();
     return data;
   };
@@ -51,16 +54,15 @@ export function AuthProvider({ children }) {
   const register = async (username, email, password, passwordConfirm) => {
     const data = await authService.register(username, email, password, passwordConfirm);
     if (data.tokens) {
-      localStorage.setItem('infishelf_access_token', data.tokens.access);
-      localStorage.setItem('infishelf_refresh_token', data.tokens.refresh);
+      // New registrations default to session-based unless remembered
+      setStoredTokens(data.tokens.access, data.tokens.refresh, false);
     }
     await fetchCurrentUser();
     return data;
   };
 
   const logout = () => {
-    localStorage.removeItem('infishelf_access_token');
-    localStorage.removeItem('infishelf_refresh_token');
+    clearStoredTokens();
     setUser(null);
   };
 

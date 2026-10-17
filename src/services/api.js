@@ -141,6 +141,13 @@ api.interceptors.response.use(
       }
     }
 
+    // Automatic 1-time retry for transient 503 Service Unavailable (e.g. remote pooler socket recycling)
+    if (error.response?.status === 503 && !originalRequest._dbRetry) {
+      originalRequest._dbRetry = true;
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      return api(originalRequest);
+    }
+
     // If the server returned an HTML error page (e.g. Django debug page or 502/504 Bad Gateway),
     // sanitize response.data into a clean object to prevent raw markup appearing in UI modals/toasts.
     if (
